@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIA Forças de Caráter - Impulso Coaching</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333; min-height: 100vh; padding: 20px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .card {
+            background: white; border-radius: 20px; padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); margin-bottom: 25px;
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        h1 {
+            text-align: center; color: #5a67d8; font-size: 2.2em; margin-bottom: 10px;
+            font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .subtitle { text-align: center; color: #718096; font-size: 1.1em; margin-bottom: 30px; }
+        .form-row {
+            display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; align-items: center;
+        }
+        .form-group { flex: 1; min-width: 200px; }
+        .form-group label {
+            display: block; font-weight: 600; color: #4a5568; margin-bottom: 6px; font-size: 0.95em;
+        }
+        .form-group input {
+            width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 12px;
+            font-size: 1em; transition: all 0.3s; background: #f8fafc;
+        }
+        .form-group input:focus {
+            outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        .age-input { max-width: 80px; font-size: 0.9em; }
+        .required::after { content: " *"; color: #e53e3e; }
+
+        /* BARRA DE PROGRESSO */
+        .progress-container {
+            margin: 20px 0; height: 12px; background: #e2e8f0; border-radius: 6px; overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .progress-bar {
+            height: 100%; width: 0%; background: linear-gradient(to right, #48bb78, #38a169);
+            border-radius: 6px; transition: width 0.5s ease; box-shadow: 0 0 10px rgba(72, 187, 120, 0.4);
+        }
+        .progress-text {
+            text-align: center; margin-top: 8px; font-size: 0.95em; color: #4a5568; font-weight: 500;
+        }
+
+        .question {
+            margin-bottom: 20px; padding: 18px; background: #f8fbff; border-radius: 14px;
+            border-left: 5px solid #667eea; transition: transform 0.2s;
+        }
+        .question:hover { transform: translateX(5px); }
+        .question-text { font-weight: 600; margin-bottom: 12px; color: #2d3748; }
+        .likert {
+            display: flex; justify-content: space-between; gap: 6px; flex-wrap: wrap;
+        }
+        .likert label {
+            flex: 1; min-width: 50px; text-align: center; padding: 10px 4px;
+            background: #e2e8f0; border-radius: 10px; font-size: 0.85em; cursor: pointer;
+            transition: all 0.2s; font-weight: 500;
+        }
+        .likert input { display: none; }
+        .likert input:checked + label,
+        .likert label:hover { background: #667eea; color: white; transform: scale(1.05); }
+
+        button {
+            display: block; width: 100%; padding: 16px; margin: 25px 0;
+            background: linear-gradient(to right, #667eea, #764ba2); color: white;
+            border: none; border-radius: 12px; font-size: 1.2em; font-weight: 600;
+            cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        button:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5); }
+
+        #report { display: none; }
+        .top5 { background: #d4edda; border-left: 6px solid #28a745; }
+        .middle { background: #d1ecf1; border-left: 6px solid #17a2b8; }
+        .bottom5 { background: #f8d7da; border-left: 6px solid #dc3545; }
+        .strength-block {
+            padding: 18px; border-radius: 14px; margin: 12px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .strength-block h4 {
+            color: #2d3748; margin-bottom: 8px; font-size: 1.1em;
+        }
+        .score-bar {
+            height: 12px; background: #e2e8f0; border-radius: 6px; overflow: hidden; margin: 8px 0;
+        }
+        .score-fill {
+            height: 100%; background: linear-gradient(to right, #667eea, #764ba2);
+            border-radius: 6px; transition: width 0.8s ease;
+        }
+        .explanation {
+            background: #f0f4ff; padding: 25px; border-radius: 16px; margin-top: 30px;
+            border: 1px dashed #667eea; font-size: 0.95em; line-height: 1.7;
+        }
+        .signature {
+            text-align: center; margin-top: 40px; font-style: italic; color: #4a5568;
+            font-size: 1.1em; padding: 20px; background: #f8f9fa; border-radius: 12px;
+        }
+        .print-btn, .email-btn {
+            display: inline-block; width: auto; padding: 12px 24px; margin: 10px 8px;
+            font-size: 1em; border-radius: 10px; text-decoration: none; color: white;
+        }
+        .print-btn { background: #28a745; }
+        .email-btn { background: #fd7e14; }
+        .print-btn:hover, .email-btn:hover { transform: scale(1.05); }
+        @media (max-width: 768px) {
+            .form-row { flex-direction: column; }
+            .form-group { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Forças de Caráter<br><span style="font-size:0.7em;color:#667eea;">Impulso Coaching</span></h1>
+            <p class="subtitle">Descubra seu perfil completo de forças de caráter</p>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="required">Nome Completo</label>
+                    <input type="text" id="fullName" placeholder="Ex: João Silva" required>
+                </div>
+                <div class="form-group">
+                    <label>Idade</label>
+                    <input type="number" id="age" class="age-input" placeholder="30" min="1" max="120">
+                </div>
+                <div class="form-group">
+                    <label>Profissão</label>
+                    <input type="text" id="profession" placeholder="Ex: Gerente de Projetos">
+                </div>
+                <div class="form-group">
+                    <label class="required">Email</label>
+                    <input type="email" id="email" placeholder="seu@email.com" required>
+                </div>
+            </div>
+
+            <!-- BARRA DE PROGRESSO -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% concluído</div>
+
+            <form id="viaSurvey">
+                <div id="questionsContainer"></div>
+                <button type="button" onclick="calculateVIA()">Gerar Meu Relatório Completo</button>
+            </form>
+        </div>
+
+        <div class="card" id="report">
+            <h1>Relatório VIA – Forças de Caráter</h1>
+            <p><strong>Cliente:</strong> <span id="reportName"></span> | 
+               <strong>Idade:</strong> <span id="reportAge"></span> | 
+               <strong>Profissão:</strong> <span id="reportProfession"></span> | 
+               <strong>Data:</strong> <span id="reportDate"></span></p>
+            <hr style="margin:20px 0; border:1px dashed #e2e8f0;">
+
+            <h2 style="color:#667eea; text-align:center; margin:25px 0;">Suas 5 Forças Signature</h2>
+            <div id="top5"></div>
+
+            <h2 style="color:#667eea; text-align:center; margin:25px 0;">Ranking Completo (24 Forças)</h2>
+            <div id="fullRank"></div>
+
+            <div class="explanation">
+                <h3>Significado das Forças de Caráter</h3>
+                <p>As <strong>24 forças de caráter</strong> do VIA são qualidades universais da personalidade que, quando usadas com frequência, promovem bem-estar, realização e resiliência. Elas são agrupadas em 6 virtudes:</p>
+                <ul style="margin:15px 0; padding-left:25px;">
+                    <li><strong>Sabedoria</strong>: Criatividade, Curiosidade, Julgamento, Amor pelo Aprendizado, Perspectiva</li>
+                    <li><strong>Coragem</strong>: Coragem, Perseverança, Integridade, Entusiasmo</li>
+                    <li><strong>Humanidade</strong>: Bondade, Amor, Inteligência Social</li>
+                    <li><strong>Justiça</strong>: Trabalho em Equipe, Equidade, Liderança</li>
+                    <li><strong>Temperança</strong>: Perdão, Humildade, Prudência, Autocontrole</li>
+                    <li><strong>Transcendência</strong>: Apreciação da Beleza, Gratidão, Esperança, Humor, Espiritualidade</li>
+                </ul>
+                <p><strong>Suas 5 principais forças (Signature Strengths)</strong> são aquelas que mais representam quem você é. Usá-las diariamente aumenta energia, engajamento e felicidade. As forças intermediárias são recursos valiosos. As mais baixas não são fraquezas — apenas menos naturais. Você pode desenvolvê-las com prática intencional.</p>
+            </div>
+
+            <div class="signature">
+                <strong>Rogério Braga</strong><br>
+                Coach Executivo & Mentor<br>
+                <a href="mailto:impulsoflow@gmail.com" style="color:#667eea;">impulsoflow@gmail.com</a>
+            </div>
+
+            <div style="text-align:center; margin-top:30px;">
+                <button class="print-btn" onclick="printReport()">Imprimir / Salvar PDF</button>
+                <button class="email-btn" onclick="sendEmail()">Enviar por Email</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { jsPDF } = window.jspdf;
+
+        // === 24 FORÇAS COM DESCRIÇÕES ===
+        const strengthData = [
+            { name: "Criatividade", desc: "Você gera ideias novas e originais. Gosta de pensar em soluções diferentes e criativas para problemas do dia a dia. Sua mente é imaginativa e inventiva." },
+            { name: "Curiosidade", desc: "Você explora o mundo com interesse genuíno. Faz perguntas, investiga e se fascina pelo desconhecido. Está sempre aberto a novas experiências." },
+            { name: "Julgamento", desc: "Você pensa criticamente e analisa situações com cuidado. Pesa prós e contras, evita conclusões precipitadas e muda de ideia com novas evidências." },
+            { name: "Amor pelo Aprendizado", desc: "Você ama adquirir novos conhecimentos e habilidades. Lê, estuda e se sente animado ao dominar algo novo. O aprendizado é uma fonte de prazer." },
+            { name: "Perspectiva", desc: "Você oferece sabedoria e visão ampla. Vê o 'quadro geral', dá conselhos profundos e ajuda os outros a encontrarem clareza em momentos difíceis." },
+            { name: "Coragem", desc: "Você enfrenta medos e desafios com valentia. Defende suas crenças, fala a verdade sob pressão e assume riscos calculados quando necessário." },
+            { name: "Perseverança", desc: "Você termina o que começa, mesmo com obstáculos. Mantém o foco em metas longas, trabalha duro e não desiste facilmente." },
+            { name: "Integridade", desc: "Você é honesto, autêntico e age de acordo com seus valores. Cumpre promessas, evita mentiras e vive com transparência." },
+            { name: "Entusiasmo", desc: "Você vive com energia e paixão. Aborda a vida com excitação, contagia os outros e se empolga facilmente com novas ideias." },
+            { name: "Bondade", desc: "Você ajuda os outros com generosidade e sem esperar nada em troca. Pratica atos de gentileza diariamente e se preocupa com o bem-estar alheio." },
+            { name: "Amor", desc: "Você forma vínculos profundos e carinhosos. Valoriza relacionamentos íntimos, demonstra afeto e prioriza tempo com quem ama." },
+            { name: "Inteligência Social", desc: "Você entende emoções e dinâmicas entre pessoas. Lê sinais sociais, sabe confortar, adapta-se ao contexto e ajuda a resolver conflitos." },
+            { name: "Trabalho em Equipe", desc: "Você colabora bem em grupos, é leal e contribui para o sucesso coletivo. Celebra vitórias do time e coloca o grupo acima do ego." },
+            { name: "Equidade", desc: "Você trata todos com justiça e imparcialidade. Evita favoritismos, defende a igualdade e julga pelas ações, não pelas aparências." },
+            { name: "Liderança", desc: "Você guia e motiva grupos com confiança. Organiza projetos, inspira os outros e toma decisões difíceis quando necessário." },
+            { name: "Perdão", desc: "Você libera ressentimentos e perdoa quem errou. Dá segundas chances, escolhe a paz e não guarda mágoas do passado." },
+            { name: "Humildade", desc: "Você deixa seus feitos falarem por si. Não se gaba, aprende com os outros, admite erros e valoriza todas as contribuições." },
+            { name: "Prudência", desc: "Você pensa antes de agir e evita riscos desnecessários. Planeja com cuidado, pesa consequências e toma decisões conscientes." },
+            { name: "Autocontrole", desc: "Você regula emoções, impulsos e desejos. Resiste a tentações, mantém a calma sob pressão e evita excessos." },
+            { name: "Apreciação da Beleza", desc: "Você se emociona com a natureza, arte e excelência. Para para admirar o belo no dia a dia e se sente inspirado por ele." },
+            { name: "Gratidão", desc: "Você reconhece e valoriza as coisas boas da vida. Expressa gratidão aos outros e mantém uma atitude de apreciação, mesmo em dias difíceis." },
+            { name: "Esperança", desc: "Você mantém otimismo e acredita em um futuro melhor. Planeja com confiança, se recupera de decepções e vê oportunidades nos desafios." },
+            { name: "Humor", desc: "Você vê o lado leve da vida. Ri facilmente, usa o humor para aliviar tensões e gosta de fazer os outros rirem." },
+            { name: "Espiritualidade", desc: "Você busca propósito e conexão com algo maior. Reflete sobre o sentido da vida e encontra paz em práticas espirituais ou contemplativas." }
+        ];
+
+        // === 120 PERGUNTAS OFICIAIS (5 por força) ===
+        const questions = [
+            // Criatividade
+            "Eu penso em novas maneiras de fazer as coisas.", "Eu gosto de inventar soluções originais.", "Eu crio coisas novas regularmente.", "Eu uso a imaginação para resolver problemas.", "Eu sou criativo no meu trabalho ou hobbies.",
+            // Curiosidade
+            "Eu faço muitas perguntas sobre o mundo.", "Eu exploro coisas novas por curiosidade.", "Eu me interesso por temas desconhecidos.", "Eu gosto de investigar como as coisas funcionam.", "Eu sou fascinado pelo desconhecido.",
+            // Julgamento
+            "Eu analiso prós e contras antes de decidir.", "Eu evito tirar conclusões precipitadas.", "Eu penso criticamente sobre as informações.", "Eu considero múltiplos pontos de vista.", "Eu mudo de ideia com novas evidências.",
+            // Amor pelo Aprendizado
+            "Eu leio para aprender coisas novas.", "Eu gosto de dominar novas habilidades.", "Eu me sinto animado ao aprender.", "Eu busco conhecimento por prazer.", "Eu estudo tópicos por conta própria.",
+            // Perspectiva
+            "Eu dou conselhos sábios aos outros.", "Eu vejo o 'quadro geral' nas situações.", "Eu ajudo os outros a terem clareza.", "Eu reflito sobre a vida com profundidade.", "Eu ofereço insights valiosos.",
+            // Coragem
+            "Eu enfrento meus medos.", "Eu defendo o que acredito.", "Eu falo a verdade mesmo sob pressão.", "Eu assumo riscos calculados.", "Eu supero obstáculos com valentia.",
+            // Perseverança
+            "Eu termino o que começo.", "Eu persisto apesar das dificuldades.", "Eu mantenho o foco em metas longas.", "Eu não desisto facilmente.", "Eu trabalho duro até concluir.",
+            // Integridade
+            "Eu sou honesto em tudo que faço.", "Eu cumpro minhas promessas.", "Eu ajo de acordo com meus valores.", "Eu sou autêntico com os outros.", "Eu evito mentir ou enganar.",
+            // Entusiasmo
+            "Eu me sinto cheio de energia pela vida.", "Eu abordo tarefas com entusiasmo.", "Eu me empolgo facilmente com ideias.", "Eu vivo com paixão.", "Eu contagio os outros com minha energia.",
+            // Bondade
+            "Eu ajudo os outros sem esperar retorno.", "Eu faço favores espontaneamente.", "Eu sou gentil com estranhos.", "Eu me preocupo com o bem-estar alheio.", "Eu pratico atos de bondade diariamente.",
+            // Amor
+            "Eu demonstro afeto às pessoas próximas.", "Eu valorizo relacionamentos íntimos.", "Eu me sinto amado e amo em troca.", "Eu priorizo tempo com quem amo.", "Eu sou carinhoso e atencioso.",
+            // Inteligência Social
+            "Eu percebo as emoções dos outros.", "Eu sei como confortar alguém.", "Eu adapto meu comportamento ao contexto.", "Eu leio bem 'sinais sociais'.", "Eu ajudo a resolver conflitos.",
+            // Trabalho em Equipe
+            "Eu coopero bem em grupos.", "Eu contribuo para o sucesso da equipe.", "Eu sou leal aos meus colegas.", "Eu celebro vitórias do time.", "Eu coloco o grupo acima do ego.",
+            // Equidade
+            "Eu trato todos com justiça.", "Eu evito favoritismos.", "Eu defendo a igualdade.", "Eu julgo pelas ações, não aparências.", "Eu sou imparcial em decisões.",
+            // Liderança
+            "Eu organizo e guio grupos.", "Eu motivo os outros a darem o melhor.", "Eu assumo responsabilidade em projetos.", "Eu inspiro confiança.", "Eu tomo decisões difíceis quando necessário.",
+            // Perdão
+            "Eu perdoo quem me magoou.", "Eu libero rancores.", "Eu dou segundas chances.", "Eu não guardo mágoa.", "Eu escolho a paz em vez do ressentimento.",
+            // Humildade
+            "Eu deixo meus feitos falarem por si.", "Eu não me gabo das conquistas.", "Eu aprendo com os outros.", "Eu admito quando erro.", "Eu valorizo todas as contribuições.",
+            // Prudência
+            "Eu penso antes de agir.", "Eu evito riscos desnecessários.", "Eu planejo com cuidado.", "Eu peso consequências.", "Eu sou cauteloso com escolhas.",
+            // Autocontrole
+            "Eu controlo meus impulsos.", "Eu resisto a tentações.", "Eu mantenho a calma sob pressão.", "Eu regulo minhas emoções.", "Eu evito excessos.",
+            // Apreciação da Beleza
+            "Eu paro para admirar a natureza.", "Eu me emociono com arte ou música.", "Eu noto beleza no dia a dia.", "Eu aprecio excelência em qualquer área.", "Eu me sinto inspirado pela beleza.",
+            // Gratidão
+            "Eu agradeço pelas coisas boas.", "Eu expesso gratidão aos outros.", "Eu mantenho um diário de gratidão.", "Eu valorizo o que tenho.", "Eu sou grato mesmo em dias ruins.",
+            // Esperança
+            "Eu acredito em um futuro melhor.", "Eu mantenho o otimismo.", "Eu planejo com confiança.", "Eu me recupero de decepções.", "Eu vejo oportunidades em desafios.",
+            // Humor
+            "Eu rio facilmente.", "Eu faço piadas para aliviar o clima.", "Eu vejo o lado engraçado da vida.", "Eu uso humor para lidar com estresse.", "Eu gosto de fazer os outros rirem.",
+            // Espiritualidade
+            "Eu sinto conexão com algo maior.", "Eu busco propósito na vida.", "Eu reflito sobre o sentido da existência.", "Eu pratico meditação ou oração.", "Eu encontro paz em práticas espirituais."
+        ];
+
+        // === GERAR PERGUNTAS ===
+        const container = document.getElementById('questionsContainer');
+        questions.forEach((q, i) => {
+            const div = document.createElement('div');
+            div.className = 'question';
+            div.innerHTML = `
+                <div class="question-text">${i + 1}. ${q}</div>
+                <div class="likert">
+                    <input type="radio" name="q${i}" value="1" id="q${i}_1"><label for="q${i}_1">1<br>Quase nunca</label>
+                    <input type="radio" name="q${i}" value="2" id="q${i}_2"><label for="q${i}_2">2</label>
+                    <input type="radio" name="q${i}" value="3" id="q${i}_3" checked><label for="q${i}_3">3</label>
+                    <input type="radio" name="q${i}" value="4" id="q${i}_4"><label for="q${i}_4">4</label>
+                    <input type="radio" name="q${i}" value="5" id="q${i}_5"><label for="q${i}_5">5<br>Quase sempre</label>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+
+        // === BARRA DE PROGRESSO ===
+        function updateProgress() {
+            const total = questions.length;
+            const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+            const percent = Math.round((answered / total) * 100);
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressText').textContent = `${percent}% concluído`;
+        }
+        document.addEventListener('change', updateProgress);
+        setInterval(updateProgress, 1000);
+
+        // === CÁLCULO DAS FORÇAS ===
+        function calculateVIA() {
+            const name = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            if (!name || !email) {
+                alert("Preencha Nome Completo e Email!");
+                return;
+            }
+
+            const scores = strengthData.map((s, idx) => {
+                let sum = 0;
+                for (let i = 0; i < 5; i++) {
+                    const val = parseInt(document.querySelector(`input[name="q${idx*5 + i}"]:checked`).value) || 3;
+                    sum += val;
+                }
+                return { ...s, score: (sum / 5).toFixed(2) };
+            });
+
+            const sorted = scores.sort((a, b) => b.score - a.score);
+
+            // Preencher dados
+            document.getElementById('reportName').textContent = name;
+            document.getElementById('reportAge').textContent = document.getElementById('age').value || "Não informado";
+            document.getElementById('reportProfession').textContent = document.getElementById('profession').value || "Não informado";
+            document.getElementById('reportDate').textContent = new Date().toLocaleDateString('pt-BR');
+
+            // Gerar blocos
+            const top5 = sorted.slice(0, 5).map((s, i) => createBlock(s, i, 'top5')).join('');
+            const middle = sorted.slice(5, 19).map((s, i) => createBlock(s, i + 5, 'middle')).join('');
+            const bottom5 = sorted.slice(19).map((s, i) => createBlock(s, i + 19, 'bottom5')).join('');
+
+            document.getElementById('top5').innerHTML = top5;
+            document.getElementById('fullRank').innerHTML = middle + bottom5;
+            document.getElementById('report').style.display = 'block';
+            document.getElementById('report').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function createBlock(s, rank, type) {
+            const percent = (s.score / 5) * 100;
+            return `
+                <div class="strength-block ${type}">
+                    <h4>${rank + 1}. ${s.name} <em>(${s.score}/5.00)</em></h4>
+                    <div class="score-bar"><div class="score-fill" style="width: ${percent}%"></div></div>
+                    <p style="margin-top:10px; font-size:0.92em;">${s.desc}</p>
+                </div>
+            `;
+        }
+
+        // === FUNÇÕES DE SAÍDA ===
+        function printReport() { window.print(); }
+        function sendEmail() {
+            alert("Relatório gerado com sucesso! Em produção, enviaria para impulsoflow@gmail.com");
+            downloadHTML();
+        }
+        function downloadHTML() {
+            const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `VIA_${document.getElementById('fullName').value.replace(/\s/g,'_') || 'Relatorio'}.html`;
+            a.click();
+        }
+    </script>
+</body>
+</html>
