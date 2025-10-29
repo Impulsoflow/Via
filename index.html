@@ -43,7 +43,7 @@
         .age-input { max-width: 80px; font-size: 0.9em; }
         .required::after { content: " *"; color: #e53e3e; }
 
-        /* BARRA DE PROGRESSO MODERNA */
+        /* BARRA DE PROGRESSO */
         .progress-container {
             margin: 20px 0; height: 12px; background: #e2e8f0; border-radius: 6px; overflow: hidden;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
@@ -110,10 +110,10 @@
         }
         .print-btn, .email-btn {
             display: inline-block; width: auto; padding: 12px 24px; margin: 10px 8px;
-            font-size: 1em; border-radius: 10px; text-decoration: none;
+            font-size: 1em; border-radius: 10px; text-decoration: none; color: white;
         }
-        .print-btn { background: #28a745; color: white; }
-        .email-btn { background: #fd7e14; color: white; }
+        .print-btn { background: #28a745; }
+        .email-btn { background: #fd7e14; }
         .print-btn:hover, .email-btn:hover { transform: scale(1.05); }
         @media (max-width: 768px) {
             .form-row { flex-direction: column; }
@@ -202,11 +202,87 @@
     <script>
         const { jsPDF } = window.jspdf;
 
-        // === DADOS DAS FORÇAS (24) ===
-        const strengthData = [ /* ... MESMAS 24 FORÇAS DO ARQUIVO ANTERIOR ... */ ];
-        const questions = [ /* ... 120 PERGUNTAS ... */ ];
+        // === 24 FORÇAS COM DESCRIÇÕES ===
+        const strengthData = [
+            { name: "Criatividade", desc: "Você gera ideias novas e originais. Gosta de pensar em soluções diferentes e criativas para problemas do dia a dia. Sua mente é imaginativa e inventiva." },
+            { name: "Curiosidade", desc: "Você explora o mundo com interesse genuíno. Faz perguntas, investiga e se fascina pelo desconhecido. Está sempre aberto a novas experiências." },
+            { name: "Julgamento", desc: "Você pensa criticamente e analisa situações com cuidado. Pesa prós e contras, evita conclusões precipitadas e muda de ideia com novas evidências." },
+            { name: "Amor pelo Aprendizado", desc: "Você ama adquirir novos conhecimentos e habilidades. Lê, estuda e se sente animado ao dominar algo novo. O aprendizado é uma fonte de prazer." },
+            { name: "Perspectiva", desc: "Você oferece sabedoria e visão ampla. Vê o 'quadro geral', dá conselhos profundos e ajuda os outros a encontrarem clareza em momentos difíceis." },
+            { name: "Coragem", desc: "Você enfrenta medos e desafios com valentia. Defende suas crenças, fala a verdade sob pressão e assume riscos calculados quando necessário." },
+            { name: "Perseverança", desc: "Você termina o que começa, mesmo com obstáculos. Mantém o foco em metas longas, trabalha duro e não desiste facilmente." },
+            { name: "Integridade", desc: "Você é honesto, autêntico e age de acordo com seus valores. Cumpre promessas, evita mentiras e vive com transparência." },
+            { name: "Entusiasmo", desc: "Você vive com energia e paixão. Aborda a vida com excitação, contagia os outros e se empolga facilmente com novas ideias." },
+            { name: "Bondade", desc: "Você ajuda os outros com generosidade e sem esperar nada em troca. Pratica atos de gentileza diariamente e se preocupa com o bem-estar alheio." },
+            { name: "Amor", desc: "Você forma vínculos profundos e carinhosos. Valoriza relacionamentos íntimos, demonstra afeto e prioriza tempo com quem ama." },
+            { name: "Inteligência Social", desc: "Você entende emoções e dinâmicas entre pessoas. Lê sinais sociais, sabe confortar, adapta-se ao contexto e ajuda a resolver conflitos." },
+            { name: "Trabalho em Equipe", desc: "Você colabora bem em grupos, é leal e contribui para o sucesso coletivo. Celebra vitórias do time e coloca o grupo acima do ego." },
+            { name: "Equidade", desc: "Você trata todos com justiça e imparcialidade. Evita favoritismos, defende a igualdade e julga pelas ações, não pelas aparências." },
+            { name: "Liderança", desc: "Você guia e motiva grupos com confiança. Organiza projetos, inspira os outros e toma decisões difíceis quando necessário." },
+            { name: "Perdão", desc: "Você libera ressentimentos e perdoa quem errou. Dá segundas chances, escolhe a paz e não guarda mágoas do passado." },
+            { name: "Humildade", desc: "Você deixa seus feitos falarem por si. Não se gaba, aprende com os outros, admite erros e valoriza todas as contribuições." },
+            { name: "Prudência", desc: "Você pensa antes de agir e evita riscos desnecessários. Planeja com cuidado, pesa consequências e toma decisões conscientes." },
+            { name: "Autocontrole", desc: "Você regula emoções, impulsos e desejos. Resiste a tentações, mantém a calma sob pressão e evita excessos." },
+            { name: "Apreciação da Beleza", desc: "Você se emociona com a natureza, arte e excelência. Para para admirar o belo no dia a dia e se sente inspirado por ele." },
+            { name: "Gratidão", desc: "Você reconhece e valoriza as coisas boas da vida. Expressa gratidão aos outros e mantém uma atitude de apreciação, mesmo em dias difíceis." },
+            { name: "Esperança", desc: "Você mantém otimismo e acredita em um futuro melhor. Planeja com confiança, se recupera de decepções e vê oportunidades nos desafios." },
+            { name: "Humor", desc: "Você vê o lado leve da vida. Ri facilmente, usa o humor para aliviar tensões e gosta de fazer os outros rirem." },
+            { name: "Espiritualidade", desc: "Você busca propósito e conexão com algo maior. Reflete sobre o sentido da vida e encontra paz em práticas espirituais ou contemplativas." }
+        ];
 
-        // Inserir perguntas (mesmo código anterior)
+        // === 120 PERGUNTAS OFICIAIS (5 por força) ===
+        const questions = [
+            // Criatividade
+            "Eu penso em novas maneiras de fazer as coisas.", "Eu gosto de inventar soluções originais.", "Eu crio coisas novas regularmente.", "Eu uso a imaginação para resolver problemas.", "Eu sou criativo no meu trabalho ou hobbies.",
+            // Curiosidade
+            "Eu faço muitas perguntas sobre o mundo.", "Eu exploro coisas novas por curiosidade.", "Eu me interesso por temas desconhecidos.", "Eu gosto de investigar como as coisas funcionam.", "Eu sou fascinado pelo desconhecido.",
+            // Julgamento
+            "Eu analiso prós e contras antes de decidir.", "Eu evito tirar conclusões precipitadas.", "Eu penso criticamente sobre as informações.", "Eu considero múltiplos pontos de vista.", "Eu mudo de ideia com novas evidências.",
+            // Amor pelo Aprendizado
+            "Eu leio para aprender coisas novas.", "Eu gosto de dominar novas habilidades.", "Eu me sinto animado ao aprender.", "Eu busco conhecimento por prazer.", "Eu estudo tópicos por conta própria.",
+            // Perspectiva
+            "Eu dou conselhos sábios aos outros.", "Eu vejo o 'quadro geral' nas situações.", "Eu ajudo os outros a terem clareza.", "Eu reflito sobre a vida com profundidade.", "Eu ofereço insights valiosos.",
+            // Coragem
+            "Eu enfrento meus medos.", "Eu defendo o que acredito.", "Eu falo a verdade mesmo sob pressão.", "Eu assumo riscos calculados.", "Eu supero obstáculos com valentia.",
+            // Perseverança
+            "Eu termino o que começo.", "Eu persisto apesar das dificuldades.", "Eu mantenho o foco em metas longas.", "Eu não desisto facilmente.", "Eu trabalho duro até concluir.",
+            // Integridade
+            "Eu sou honesto em tudo que faço.", "Eu cumpro minhas promessas.", "Eu ajo de acordo com meus valores.", "Eu sou autêntico com os outros.", "Eu evito mentir ou enganar.",
+            // Entusiasmo
+            "Eu me sinto cheio de energia pela vida.", "Eu abordo tarefas com entusiasmo.", "Eu me empolgo facilmente com ideias.", "Eu vivo com paixão.", "Eu contagio os outros com minha energia.",
+            // Bondade
+            "Eu ajudo os outros sem esperar retorno.", "Eu faço favores espontaneamente.", "Eu sou gentil com estranhos.", "Eu me preocupo com o bem-estar alheio.", "Eu pratico atos de bondade diariamente.",
+            // Amor
+            "Eu demonstro afeto às pessoas próximas.", "Eu valorizo relacionamentos íntimos.", "Eu me sinto amado e amo em troca.", "Eu priorizo tempo com quem amo.", "Eu sou carinhoso e atencioso.",
+            // Inteligência Social
+            "Eu percebo as emoções dos outros.", "Eu sei como confortar alguém.", "Eu adapto meu comportamento ao contexto.", "Eu leio bem 'sinais sociais'.", "Eu ajudo a resolver conflitos.",
+            // Trabalho em Equipe
+            "Eu coopero bem em grupos.", "Eu contribuo para o sucesso da equipe.", "Eu sou leal aos meus colegas.", "Eu celebro vitórias do time.", "Eu coloco o grupo acima do ego.",
+            // Equidade
+            "Eu trato todos com justiça.", "Eu evito favoritismos.", "Eu defendo a igualdade.", "Eu julgo pelas ações, não aparências.", "Eu sou imparcial em decisões.",
+            // Liderança
+            "Eu organizo e guio grupos.", "Eu motivo os outros a darem o melhor.", "Eu assumo responsabilidade em projetos.", "Eu inspiro confiança.", "Eu tomo decisões difíceis quando necessário.",
+            // Perdão
+            "Eu perdoo quem me magoou.", "Eu libero rancores.", "Eu dou segundas chances.", "Eu não guardo mágoa.", "Eu escolho a paz em vez do ressentimento.",
+            // Humildade
+            "Eu deixo meus feitos falarem por si.", "Eu não me gabo das conquistas.", "Eu aprendo com os outros.", "Eu admito quando erro.", "Eu valorizo todas as contribuições.",
+            // Prudência
+            "Eu penso antes de agir.", "Eu evito riscos desnecessários.", "Eu planejo com cuidado.", "Eu peso consequências.", "Eu sou cauteloso com escolhas.",
+            // Autocontrole
+            "Eu controlo meus impulsos.", "Eu resisto a tentações.", "Eu mantenho a calma sob pressão.", "Eu regulo minhas emoções.", "Eu evito excessos.",
+            // Apreciação da Beleza
+            "Eu paro para admirar a natureza.", "Eu me emociono com arte ou música.", "Eu noto beleza no dia a dia.", "Eu aprecio excelência em qualquer área.", "Eu me sinto inspirado pela beleza.",
+            // Gratidão
+            "Eu agradeço pelas coisas boas.", "Eu expesso gratidão aos outros.", "Eu mantenho um diário de gratidão.", "Eu valorizo o que tenho.", "Eu sou grato mesmo em dias ruins.",
+            // Esperança
+            "Eu acredito em um futuro melhor.", "Eu mantenho o otimismo.", "Eu planejo com confiança.", "Eu me recupero de decepções.", "Eu vejo oportunidades em desafios.",
+            // Humor
+            "Eu rio facilmente.", "Eu faço piadas para aliviar o clima.", "Eu vejo o lado engraçado da vida.", "Eu uso humor para lidar com estresse.", "Eu gosto de fazer os outros rirem.",
+            // Espiritualidade
+            "Eu sinto conexão com algo maior.", "Eu busco propósito na vida.", "Eu reflito sobre o sentido da existência.", "Eu pratico meditação ou oração.", "Eu encontro paz em práticas espirituais."
+        ];
+
+        // === GERAR PERGUNTAS ===
         const container = document.getElementById('questionsContainer');
         questions.forEach((q, i) => {
             const div = document.createElement('div');
@@ -224,7 +300,7 @@
             container.appendChild(div);
         });
 
-        // === ATUALIZAR BARRA DE PROGRESSO ===
+        // === BARRA DE PROGRESSO ===
         function updateProgress() {
             const total = questions.length;
             const answered = document.querySelectorAll('input[type="radio"]:checked').length;
@@ -232,21 +308,22 @@
             document.getElementById('progressBar').style.width = percent + '%';
             document.getElementById('progressText').textContent = `${percent}% concluído`;
         }
-
-        // Atualiza a cada mudança
         document.addEventListener('change', updateProgress);
-        setInterval(updateProgress, 1000); // Atualiza mesmo se rolar
+        setInterval(updateProgress, 1000);
 
-        // === CÁLCULO ===
+        // === CÁLCULO DAS FORÇAS ===
         function calculateVIA() {
             const name = document.getElementById('fullName').value.trim();
             const email = document.getElementById('email').value.trim();
-            if (!name || !email) { alert("Preencha Nome e Email!"); return; }
+            if (!name || !email) {
+                alert("Preencha Nome Completo e Email!");
+                return;
+            }
 
             const scores = strengthData.map((s, idx) => {
                 let sum = 0;
                 for (let i = 0; i < 5; i++) {
-                    const val = parseInt(document.querySelector(`input[name="q${idx*5 + i}"]:checked`).value);
+                    const val = parseInt(document.querySelector(`input[name="q${idx*5 + i}"]:checked`).value) || 3;
                     sum += val;
                 }
                 return { ...s, score: (sum / 5).toFixed(2) };
@@ -260,6 +337,7 @@
             document.getElementById('reportProfession').textContent = document.getElementById('profession').value || "Não informado";
             document.getElementById('reportDate').textContent = new Date().toLocaleDateString('pt-BR');
 
+            // Gerar blocos
             const top5 = sorted.slice(0, 5).map((s, i) => createBlock(s, i, 'top5')).join('');
             const middle = sorted.slice(5, 19).map((s, i) => createBlock(s, i + 5, 'middle')).join('');
             const bottom5 = sorted.slice(19).map((s, i) => createBlock(s, i + 19, 'bottom5')).join('');
@@ -281,15 +359,18 @@
             `;
         }
 
-        // === IMPRIMIR / PDF / EMAIL ===
+        // === FUNÇÕES DE SAÍDA ===
         function printReport() { window.print(); }
-        function sendEmail() { alert("Relatório gerado! Em produção, enviaria para impulsoflow@gmail.com"); downloadHTML(); }
+        function sendEmail() {
+            alert("Relatório gerado com sucesso! Em produção, enviaria para impulsoflow@gmail.com");
+            downloadHTML();
+        }
         function downloadHTML() {
-            const content = document.documentElement.outerHTML;
-            const blob = new Blob([content], { type: 'text/html' });
+            const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url; a.download = `VIA_${document.getElementById('fullName').value.replace(/\s/g,'_')}.html`;
+            a.href = url;
+            a.download = `VIA_${document.getElementById('fullName').value.replace(/\s/g,'_') || 'Relatorio'}.html`;
             a.click();
         }
     </script>
