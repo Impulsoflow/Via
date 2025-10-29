@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ciaCHARACTER - Pesquisa de Personalidade</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #6366f1;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-600: #4b5563;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --success: #10b981;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      color: var(--gray-900);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 560px;
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .header {
+      background: var(--primary);
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .progress-container {
+      background: var(--gray-100);
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .content {
+      padding: 2rem;
+    }
+
+    .welcome-screen, .question-screen, .thank-you-screen {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .welcome-screen.active, .question-screen.active, .thank-you-screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-number {
+      font-size: 0.875rem;
+      color: var(--gray-600);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .question-text {
+      font-size: 1.25rem;
+      font-weight: 500;
+      line-height: 1.5;
+      text-align: center;
+      margin-bottom: 2rem;
+      color: var(--gray-800);
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .option {
+      position: relative;
+    }
+
+    .option input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      background: var(--gray-100);
+      border: 2px solid transparent;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .option-label:hover {
+      background: var(--gray-200);
+    }
+
+    .option input:checked + .option-label {
+      background: #eef2ff;
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .option-label .check {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--gray-300);
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+
+    .option input:checked + .option-label .check {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .option input:checked + .option-label .check::after {
+      content: "";
+      display: block;
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+      margin: 5px auto;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary {
+      background: var(--gray-200);
+      color: var(--gray-700);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-300);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      flex: 1;
+      margin-left: 1rem;
+    }
+
+    .btn-primary:disabled {
+      background: var(--gray-300);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .btn-primary:not(:disabled):hover {
+      background: var(--primary-light);
+    }
+
+    .thank-you-screen {
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+
+    .thank-you-screen h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      color: var(--success);
+    }
+
+    .thank-you-screen p {
+      color: var(--gray-600);
+      margin-bottom: 1.5rem;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 50%;
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        margin: 0.5rem;
+      }
+      .content {
+        padding: 1.5rem;
+      }
+      .question-text {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>ciaCHARACTER</h1>
+      <p>Descubra seus pontos fortes com precisão</p>
+    </div>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="content">
+      <!-- Tela de Boas-vindas -->
+      <div class="welcome-screen active" id="welcomeScreen">
+        <div style="text-align: center; margin-bottom: 2rem;">
+          <div class="logo">C</div>
+          <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Bem-vindo à Pesquisa</h2>
+          <p style="color: var(--gray-600); line-height: 1.6;">
+            Esta avaliação contém <strong>120 afirmações</strong>.<br>
+            Responda com honestidade, marcando o quanto você concorda com cada uma.
+          </p>
+        </div>
+        <div class="options" style="margin: 2rem 0;">
+          <p style="text-align: center; font-weight: 500; color: var(--gray-700);">
+            1 = Discordo totalmente<br>
+            5 = Concordo totalmente
+          </p>
+        </div>
+        <div class="nav-buttons">
+          <div></div>
+          <button class="btn btn-primary" id="startBtn">Começar Pesquisa</button>
+        </div>
+      </div>
+
+      <!-- Tela de Perguntas -->
+      <div class="question-screen" id="questionScreen">
+        <div class="question-number" id="questionNumber">Pergunta 1 de 120</div>
+        <div class="question-text" id="questionText"></div>
+        <div class="options">
+          <label class="option">
+            <input type="radio" name="answer" value="1">
+            <span class="option-label">
+              <span>1 - Discordo totalmente</span>
+              <span class="check"></span>
+            </span>
+          </label>
+          <label class="option">
+            <input type="radio" name="answer" value="2">
+            <span class="option-label">
+              <span>2</span>
+              <span class="check"></span>
+            </span>
+          </label>
+          <label class="option">
+            <input type="radio" name="answer" value="3">
+            <span class="option-label">
+              <span>3</span>
+              <span class="check"></span>
+            </span>
+          </label>
+          <label class="option">
+            <input type="radio" name="answer" value="4">
+            <span class="option-label">
+              <span>4</span>
+              <span class="check"></span>
+            </span>
+          </label>
+          <label class="option">
+            <input type="radio" name="answer" value="5">
+            <span class="option-label">
+              <span>5 - Concordo totalmente</span>
+              <span class="check"></span>
+            </span>
+          </label>
+        </div>
+        <div class="nav-buttons">
+          <button class="btn btn-secondary" id="prevBtn">Anterior</button>
+          <button class="btn btn-primary" id="nextBtn" disabled>Próxima</button>
+        </div>
+      </div>
+
+      <!-- Tela de Obrigado -->
+      <div class="thank-you-screen" id="thankYouScreen">
+        <div class="logo">✓</div>
+        <h2>Obrigado!</h2>
+        <p>Sua pesquisa foi concluída com sucesso.</p>
+        <p style="font-size: 0.9rem; color: var(--gray-500);">
+          Em breve você receberá seus resultados por e-mail.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      "Ser capaz de propor ideias novas e diferentes é um de meus pontos fortes.",
+      "Eu tenho tomado posições, mesmo frente a forte oposição",
+      "Eu nunca desisto de uma tarefa antes de terminá-la.",
+      "Eu sempre mantenho minhas promessas.",
+      "Eu não tenho problemas em comer alimentos saudáveis.",
+      "Eu sempre considero o lado bom das coisas.",
+      "Eu sou uma pessoa espiritualizada.",
+      "Eu sei como me comportar em diferentes situações sociais.",
+      "Eu sempre termino o que começo.",
+      "Eu realmente gosto de fazer pequenos favores aos amigos.",
+      "Há pessoas em minha vida que se preocupam tanto com o meu bem-estar e sentimentos quanto com seus próprios.",
+      "Como um lider, eu trato a todos igualmente bem, independentemente de quem seja.",
+      "Mesmo com doces e guloseimas à minha disposição, eu nunca como demais.",
+      "Eu pratico minha religião.",
+      "Eu raramente guardo rancor.",
+      "Eu estou sempre ocupado com algo interessante.",
+      "Eu vibro quando aprendo algo novo.",
+      "Eu gosto de pensar em novas maneiras de fazer as coisas.",
+      "Não importa a situação, eu sou capaz de me ajustar a ela.",
+      "Eu nunca hesito em expressar publicamente uma opinião não popular.",
+      "Eu acredito que a honestidade é a base da confiança.",
+      "Eu ponho de lado minhas prioridades para animar quem está pra baixo.",
+      "Eu trato todas as pessoas de forma igual, independentemente de quem sejam.",
+      "Um dos meus pontos fortes é ajudar pessoas a trabalharem bem em grupo mesmo quando elas têm suas diferenças.",
+      "Eu sou uma pessoa extremamente disciplinada.",
+      "Eu sempre penso antes de falar.",
+      "Eu experiencio profundas emoções quando vejo a beleza das coisas.",
+      "Pelo menos uma vez por dia, eu paro e conto minhas bênçãos.",
+      "Apesar dos desafios, eu sempre me sinto esperançoso quanto ao futuro",
+      "Minha fé nunca me abandona durante tempos difíceis.",
+      "Eu não ajo como se fosse uma pessoa especial.",
+      "Eu aproveito a oportunidade de iluminar o dia de alguém com uma risada.",
+      "Nunca procuro me vingar.",
+      "Eu valorizo minha habilidade de pensar criticamente.",
+      "Eu tenho habilidade de fazer outras pessoas se sentirem interessantes.",
+      "Eu devo me apoiar no que acredito mesmo quando resulta em algo negativo.",
+      "Eu termino as tarefas apesar dos obstáculos.",
+      "Eu adoro fazer as outras pessoas felizes.",
+      "Eu sou a pessoa mais importante da vida de alguém.",
+      "Eu faço o meu melhor quando sou membro de um grupo.",
+      "Os direitos de todos são igualmente importantes para mim.",
+      "Eu vejo beleza naquilo que as outras pessoas não vêem.",
+      "Eu tenho uma imagem clara na minha mente sobre o que eu quero que aconteça no futuro.",
+      "Nunca conto vantagem sobre minhas realizações.",
+      "Eu tento me divertir em qualquer situação.",
+      "Eu amo o que faço.",
+      "Eu estou entusiasmado com muitas atividades diferentes.",
+      "Eu sou um verdadeiro aprendiz ao longo da vida.",
+      "Eu sempre proponho novas maneiras de fazer algo.",
+      "As pessoas me descrevem como alguém a frente do meu tempo.",
+      "Minhas promessas são confiáveis.",
+      "Eu ofereço a todos uma chance.",
+      "Para ser um líder efetivo, eu trato todos da mesma forma.",
+      "Eu nunca quero coisas que não são boas para mim a longo prazo, mesmo que me façam sentir bem no curto prazo.",
+      "Eu frequentemente fico sem palavras diante da beleza retratada em um filme.",
+      "Eu sou uma pessoa extremamente grata.",
+      "Eu tento acrescentar humor a tudo o que eu faço.",
+      "Eu espero ansiosamente cada dia.",
+      "Eu acredito que o melhor é perdoar e esquecer.",
+      "Eu tenho muitos interesses.",
+      "Quando a situação exige, eu posso ser extremamente racional.",
+      "Meus amigos dizem que eu tenho muitas ideias novas e diferentes.",
+      "Eu sempre estou disposto a olhar para as coisas e vê-las mais amplamente.",
+      "Eu sempre defendo as minhas convicções.",
+      "Eu não desisto.",
+      "Eu sou fiel a meus valores pessoais.",
+      "Eu sempre sinto a presença do amor em minha vida.",
+      "Eu sempre posso seguir uma dieta.",
+      "Eu sempre penso nas consequências antes de agir.",
+      "Eu sempre estou consciente da beleza natural do ambiente.",
+      "Minha fé me faz quem eu sou.",
+      "Eu tenho muita energia.",
+      "Eu posso encontrar algo interessante em qualquer situação.",
+      "Eu leio o tempo todo.",
+      "Pensar através dos fatos é parte de quem eu sou.",
+      "Eu tenho pensamentos originais.",
+      "Eu sou bom em perceber o que os outros estão sentindo.",
+      "Eu tenho uma visão madura na vida.",
+      "Eu fico tão excitado com a boa sorte dos outros quanto com a minha.",
+      "Eu posso expressar amor por alguém.",
+      "Sem exceção, eu apoio meus colegas de grupo.",
+      "Meus amigos sempre me dizem que eu sou um líder forte, mas justo.",
+      "Eu sempre diferencio o certo do errado.",
+      "Eu me sinto grato pelo que recebi na vida.",
+      "Eu sei que vou alcançar os objetivos que coloquei para mim.",
+      "Eu raramente chamo atenção para mim mesmo.",
+      "Eu tenho um ótimo senso de humor.",
+      "Eu raramente tento me vingar.",
+      "Eu sempre peso os prós e os contras.",
+      "Eu me empenho em qualquer coisa que eu decida fazer.",
+      "Eu gosto de ser gentil com os outros.",
+      "Eu posso aceitar o amor de outras pessoas.",
+      "Mesmo que eu discorde deles, eu sempre respeito os líderes de meu grupo.",
+      "Mesmo que eu não goste de alguém, trato-o de forma justa.",
+      "Como um líder, eu tento fazer todos os membros do grupo felizes.",
+      "Sou uma pessoa muito cuidadosa.",
+      "Eu me surpreendo com coisas simples da vida que outras pessoas podem não perceber.",
+      "Quando olho para minha vida, encontro muitas coisas para me sentir grata.",
+      "Ouvi dizer que modéstia é uma de minhas mais notáveis características.",
+      "Eu normalmente estou disposto a oferecer a alguém uma outra chance.",
+      "Eu acho minha vida extremamente interessante.",
+      "Eu já li uma grande variedade de livros.",
+      "Eu tento ter boas razões para minhas decisões importantes.",
+      "Eu sempre sei o que dizer para fazer as pessoas se sentirem bem.",
+      "Eu posso não dizer aos outros, mas me considero uma pessoa sábia.",
+      "É importante para mim respeitar as decisões tomadas pelo meu grupo.",
+      "Eu sempre faço escolhas cuidadosamente.",
+      "Eu sinto todos os dias um profundo senso de apreciação.",
+      "Se me sinto mal, eu sempre penso nas coisas boas da minha vida.",
+      "Minhas crenças fazem a minha vida importante.",
+      "Eu acordo excitado com as possibilidades do dia.",
+      "Adoro ler livros de não ficção para me divertir.",
+      "Os outros me consideram uma pessoa sábia.",
+      "Eu sou uma pessoa corajosa.",
+      "Os outros confiam em mim para guardar seus segredos.",
+      "Eu sacrifico com prazer meu interesse pessoal em benefício do grupo no qual estou.",
+      "Eu acredito que é digno ouvir as opiniões de todos.",
+      "As pessoas se aproximam de mim porque sou humilde.",
+      "Sou conhecido pelo meu senso de humor.",
+      "As pessoas me descrevem como cheio de entusiasmo."
+    ];
+
+    let currentQuestion = 0;
+    const answers = new Array(questions.length).fill(null);
+
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const questionScreen = document.getElementById('questionScreen');
+    const thankYouScreen = document.getElementById('thankYouScreen');
+    const questionText = document.getElementById('questionText');
+    const questionNumber = document.getElementById('questionNumber');
+    const progressBar = document.getElementById('progressBar');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const startBtn = document.getElementById('startBtn');
+
+    function updateProgress() {
+      const progress = ((currentQuestion + 1) / questions.length) * 100;
+      progressBar.style.width = `${progress}%`;
+      questionNumber.textContent = `Pergunta ${currentQuestion + 1} de ${questions.length}`;
+    }
+
+    function showQuestion() {
+      questionText.textContent = questions[currentQuestion];
+      updateProgress();
+
+      const radios = document.querySelectorAll('input[name="answer"]');
+      radios.forEach(radio => {
+        radio.checked = answers[currentQuestion] == radio.value;
+        radio.onchange = () => {
+          answers[currentQuestion] = radio.value;
+          nextBtn.disabled = false;
+        };
+      });
+
+      prevBtn.style.display = currentQuestion === 0 ? 'none' : 'block';
+      nextBtn.textContent = currentQuestion === questions.length - 1 ? 'Finalizar' : 'Próxima';
+      nextBtn.disabled = answers[currentQuestion] === null;
+    }
+
+    startBtn.onclick = () => {
+      welcomeScreen.classList.remove('active');
+      questionScreen.classList.add('active');
+      showQuestion();
+    };
+
+    nextBtn.onclick = () => {
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        showQuestion();
+      } else {
+        questionScreen.classList.remove('active');
+        thankYouScreen.classList.add('active');
+      }
+    };
+
+    prevBtn.onclick = () => {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        showQuestion();
+      }
+    };
+
+    // Inicializa
+    updateProgress();
+  </script>
+</body>
+</html>
